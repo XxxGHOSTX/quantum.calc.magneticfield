@@ -1,6 +1,3 @@
-# quantum.calc.magneticfieldSure, I can help you create a README. Here is a README for the code you have provided:
-
-
 # x_point
 
 This Python code calculates the x-coordinate of the x-point in a magnetic field using quantum qubits.
