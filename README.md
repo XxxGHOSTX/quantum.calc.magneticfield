@@ -36,4 +36,4 @@ The code will print the x-coordinate of the x-point for each data point in the C
 
 ## Author
 
-This code was created by Tony Macier III 
+This code was created by LT.III
