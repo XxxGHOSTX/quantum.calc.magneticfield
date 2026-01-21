@@ -24,15 +24,25 @@ def x_point(By, Bz, theta):
     """
     Calculates the x-coordinate of the x-point in a magnetic field.
 
+    This function uses a simplified magnetic field model where the x-point location
+    is derived from the magnetic field components. The formula calculates the
+    position based on the ratio of field components and angular orientation.
+
+    Physical basis:
+    - By and Bz represent orthogonal magnetic field components
+    - theta is the angle in the field plane (in radians)
+    - The formula models the x-point as the location where field lines reconnect
+    - The +1 in the denominator prevents division by zero and provides stability
+
     Args:
-        By: The By component of the magnetic field.
-        Bz: The Bz component of the magnetic field.
-        theta: The angle between the By and Bz components of the magnetic field.
+        By: The By component of the magnetic field (array or scalar).
+        Bz: The Bz component of the magnetic field (array or scalar).
+        theta: The angle between the By and Bz components (in radians, array or scalar).
 
     Returns:
-        The x-coordinate of the x-point.
+        The x-coordinate of the x-point (numpy array or scalar).
     """
-    # Calculate the x-coordinate using standard magnetic field formulas
+    # Calculate the x-coordinate using the magnetic field reconnection model
     # The x-point location in magnetic reconnection theory
     x = np.sqrt(By**2 / (Bz**2 + 1)) * np.cos(theta)
 
