@@ -1,0 +1,69 @@
+MIT License
+
+Copyright (c) 2026 Tony Ray Macier III
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+===============================================================================
+ADDITIONAL TERMS AND CREDITS
+===============================================================================
+
+AUTHOR AND COPYRIGHT HOLDER:
+Tony Ray Macier III
+
+PROJECT: Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
+         and Advanced 3D Visualization
+
+COMPONENTS COVERED:
+- Core magnetic field x-point calculations
+- Mandelbrot fractal generation and visualization
+- Quantum gravity equations and simulations
+- Black hole thermodynamics calculations
+- Quantum error correction frameworks
+- Quantum sensing implementations
+- Fluid dynamics equations
+- Interactive 2D and 3D web visualizations
+- All mathematical frameworks and equation implementations
+- Publication-ready documentation
+
+ATTRIBUTION REQUIREMENTS:
+When using, modifying, or distributing this software or its derivatives,
+proper attribution must be given to Tony Ray Macier III as the original
+author and copyright holder.
+
+CITATION:
+If you use this work in academic or research contexts, please cite:
+    Macier III, T. R. (2026). Quantum Magnetic Field Calculator with 
+    Mandelbrot Fractal Analysis and Advanced Visualization. 
+    GitHub: XxxGHOSTX/quantum.calc.magneticfield
+
+THIRD-PARTY DEPENDENCIES:
+This software uses the following open-source libraries, each with their
+own licenses:
+- NumPy (BSD License)
+- Pandas (BSD License)
+- Matplotlib (PSF License)
+- Flask (BSD License)
+- Three.js (MIT License)
+- Python (PSF License)
+
+Users must comply with the licenses of these dependencies when using this
+software.
+
+===============================================================================

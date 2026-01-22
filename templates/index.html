@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<!--
+    Mandelbrot Fractal Explorer with Infinite Zoom
+    Part of: Quantum Magnetic Field Calculator
+    
+    Copyright (c) 2026 Tony Ray Macier III
+    Licensed under the MIT License
+    
+    Author: Tony Ray Macier III
+    GitHub: @XxxGHOSTX
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot Fractal Explorer - Quantum Magnetic Field Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Left Panel - Canvas */
+        .canvas-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #fractal-canvas {
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            cursor: crosshair;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            background: #000;
+        }
+
+        .canvas-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .info-label {
+            color: #a0a0a0;
+        }
+
+        .info-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        /* Right Panel - Controls */
+        .control-panel {
+            width: 380px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 2px solid #7b2cbf;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #00d4ff;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        h2 {
+            color: #7b2cbf;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #7b2cbf;
+            padding-bottom: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff006e);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+
+        .value-display {
+            display: inline-block;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 0.95em;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #7b2cbf, #ff006e);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ff006e, #d62828);
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            background: rgba(123, 44, 191, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #7b2cbf;
+            margin-bottom: 20px;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+            margin-bottom: 20px;
+        }
+
+        .timeline-bar {
+            position: relative;
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid #00d4ff;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .timeline-controls button {
+            flex: 1;
+        }
+
+        .play-pause-btn {
+            background: linear-gradient(135deg, #00d4ff, #00a8cc);
+            font-size: 1.1em;
+        }
+
+        /* Quality Selector */
+        .quality-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .quality-btn {
+            padding: 8px;
+            background: rgba(123, 44, 191, 0.3);
+            border: 1px solid #7b2cbf;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+        }
+
+        .quality-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            border-color: #00d4ff;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.idle {
+            background: #a0a0a0;
+        }
+
+        .status-indicator.active {
+            background: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-indicator.zooming {
+            background: #ff006e;
+            box-shadow: 0 0 10px rgba(255, 0, 110, 0.8);
+            animation: pulse 0.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Target Point Selector */
+        .target-presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid #00d4ff;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+        }
+
+        .preset-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 212, 255, 0.3);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: rgba(123, 44, 191, 0.3);
+            border: 1px solid #7b2cbf;
+            border-radius: 5px;
+            color: #00d4ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(123, 44, 191, 0.5);
+            transform: translateX(5px);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #7b2cbf, #ff006e);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <h1>🌌 Mandelbrot Fractal Explorer with Infinite Zoom</h1>
+            <canvas id="fractal-canvas" width="800" height="600"></canvas>
+            
+            <div class="canvas-info">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">
+                            <span class="status-indicator idle" id="statusIndicator"></span>
+                            <span id="statusText">Idle</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Zoom Level:</span>
+                        <span class="info-value" id="zoomLevel">1.0x</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Frame:</span>
+                        <span class="info-value" id="currentFrame">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">FPS:</span>
+                        <span class="info-value" id="fpsCounter">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Center:</span>
+                        <span class="info-value" id="centerCoords">(0.0, 0.0)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fractal Dim:</span>
+                        <span class="info-value" id="fractalDim">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h2>⚙️ Infinite Zoom Controls</h2>
+            
+            <!-- Timeline -->
+            <div class="timeline-container">
+                <label>Animation Timeline</label>
+                <div class="timeline-bar">
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                </div>
+                <div class="timeline-controls">
+                    <button class="play-pause-btn" id="playPauseBtn" onclick="togglePlayPause()">▶️ Play</button>
+                    <button class="secondary" onclick="resetZoom()">🔄 Reset</button>
+                </div>
+            </div>
+
+            <!-- Zoom Speed Control -->
+            <div class="control-group">
+                <label>Zoom Speed: <span class="value-display" id="zoomSpeedValue">1.05x</span></label>
+                <input type="range" id="zoomSpeed" min="1.01" max="1.20" step="0.01" value="1.05" oninput="updateZoomSpeed(this.value)">
+                <small style="color: #a0a0a0; display: block; margin-top: 5px;">
+                    1.01 = Slow, 1.20 = Fast
+                </small>
+            </div>
+
+            <!-- Quality Settings -->
+            <div class="control-group">
+                <label>Render Quality</label>
+                <div class="quality-selector">
+                    <div class="quality-btn" onclick="setQuality(140, 105)">140p</div>
+                    <div class="quality-btn" onclick="setQuality(240, 180)">240p</div>
+                    <div class="quality-btn" onclick="setQuality(360, 270)">360p</div>
+                    <div class="quality-btn" onclick="setQuality(480, 360)">480p</div>
+                    <div class="quality-btn active" onclick="setQuality(800, 600)">600p</div>
+                    <div class="quality-btn" onclick="setQuality(1280, 720)">720p</div>
+                </div>
+            </div>
+
+            <!-- Iteration Control -->
+            <div class="control-group">
+                <label>Max Iterations: <span class="value-display" id="iterValue">256</span></label>
+                <input type="range" id="maxIter" min="64" max="1024" step="32" value="256" oninput="updateIter(this.value)">
+            </div>
+
+            <h2>🎯 Target Point Selection</h2>
+            
+            <!-- Preset Targets -->
+            <div class="control-group">
+                <label>Interesting Locations</label>
+                <div class="target-presets">
+                    <div class="preset-btn" onclick="setTarget(-0.7, 0.0)">Main Set</div>
+                    <div class="preset-btn" onclick="setTarget(-0.75, 0.1)">Spiral</div>
+                    <div class="preset-btn" onclick="setTarget(-0.1592, 1.0317)">Elephant Valley</div>
+                    <div class="preset-btn" onclick="setTarget(0.285, 0.01)">Triple Spiral</div>
+                    <div class="preset-btn" onclick="setTarget(-0.7454, 0.1130)">Seahorse</div>
+                    <div class="preset-btn" onclick="setTarget(-0.16, 1.0405)">Double Hook</div>
+                </div>
+            </div>
+
+            <!-- Custom Target -->
+            <div class="control-group">
+                <label>Custom Target X:</label>
+                <input type="number" id="targetX" value="-0.7" step="0.001" onchange="updateCustomTarget()">
+            </div>
+            <div class="control-group">
+                <label>Custom Target Y:</label>
+                <input type="number" id="targetY" value="0.0" step="0.001" onchange="updateCustomTarget()">
+            </div>
+
+            <button onclick="setTargetFromCanvas()">📍 Click Canvas to Set Target</button>
+
+            <h2>🛠️ Advanced Controls</h2>
+            
+            <!-- Frame Limit -->
+            <div class="control-group">
+                <label>Max Frames (0 = Infinite): <span class="value-display" id="maxFramesValue">0</span></label>
+                <input type="range" id="maxFrames" min="0" max="10000" step="100" value="0" oninput="updateMaxFrames(this.value)">
+            </div>
+
+            <!-- Rendering Options -->
+            <div class="zoom-controls">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="smoothZoom" checked> Smooth Zoom Interpolation
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="autoAdjustIter" checked> Auto-Adjust Iterations
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="showCoords"> Show Coordinates on Click
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="generateSingleFrame()">📸 Generate Single Frame</button>
+            <button class="secondary" onclick="exportAnimation()">💾 Export Settings</button>
+
+            <a href="/3d" class="nav-link">🚀 Go to 3D Visualization →</a>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let canvas, ctx;
+        let isPlaying = false;
+        let zoomLevel = 1.0;
+        let currentFrame = 0;
+        let centerX = -0.7, centerY = 0.0;
+        let targetX = -0.7, targetY = 0.0;
+        let width = 800, height = 600;
+        let maxIter = 256;
+        let zoomSpeed = 1.05;
+        let maxFrames = 0;
+        let clickToSetTarget = false;
+        let lastFrameTime = Date.now();
+        let fps = 0;
+
+        // Initialize
+        window.onload = function() {
+            canvas = document.getElementById('fractal-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Canvas click handler
+            canvas.addEventListener('click', handleCanvasClick);
+            
+            // Initial render
+            generateFrame();
+        };
+
+        function handleCanvasClick(event) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            if (clickToSetTarget) {
+                // Convert pixel to complex coordinates
+                const scale = 3.5 / Math.pow(zoomSpeed, currentFrame);
+                const realPart = centerX + (x - width/2) * scale / width;
+                const imagPart = centerY + (y - height/2) * scale / height;
+                
+                targetX = realPart;
+                targetY = imagPart;
+                document.getElementById('targetX').value = realPart.toFixed(6);
+                document.getElementById('targetY').value = imagPart.toFixed(6);
+                
+                clickToSetTarget = false;
+                updateStatus('Target set!', 'active');
+                setTimeout(() => updateStatus('Idle', 'idle'), 2000);
+            } else if (document.getElementById('showCoords').checked) {
+                // Just show coordinates
+                const scale = 3.5 / Math.pow(zoomSpeed, currentFrame);
+                const realPart = centerX + (x - width/2) * scale / width;
+                const imagPart = centerY + (y - height/2) * scale / height;
+                alert(`Complex coordinates:\nReal: ${realPart.toFixed(8)}\nImaginary: ${imagPart.toFixed(8)}`);
+            } else {
+                // Zoom to clicked point
+                const scale = 3.5 / Math.pow(zoomSpeed, currentFrame);
+                centerX = centerX + (x - width/2) * scale / width;
+                centerY = centerY + (y - height/2) * scale / height;
+                targetX = centerX;
+                targetY = centerY;
+                generateFrame();
+            }
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playPauseBtn');
+            
+            if (isPlaying) {
+                btn.textContent = '⏸️ Pause';
+                btn.style.background = 'linear-gradient(135deg, #ff006e, #d62828)';
+                updateStatus('Zooming', 'zooming');
+                animationLoop();
+            } else {
+                btn.textContent = '▶️ Play';
+                btn.style.background = 'linear-gradient(135deg, #00d4ff, #00a8cc)';
+                updateStatus('Paused', 'idle');
+            }
+        }
+
+        function animationLoop() {
+            if (!isPlaying) return;
+            
+            // Check frame limit
+            if (maxFrames > 0 && currentFrame >= maxFrames) {
+                togglePlayPause();
+                alert('Reached maximum frames!');
+                return;
+            }
+            
+            // Calculate FPS
+            const now = Date.now();
+            const delta = now - lastFrameTime;
+            fps = Math.round(1000 / delta);
+            lastFrameTime = now;
+            document.getElementById('fpsCounter').textContent = fps;
+            
+            // Zoom towards target
+            if (document.getElementById('smoothZoom').checked) {
+                centerX = centerX + (targetX - centerX) * 0.1;
+                centerY = centerY + (targetY - centerY) * 0.1;
+            } else {
+                centerX = targetX;
+                centerY = targetY;
+            }
+            
+            // Auto-adjust iterations based on zoom
+            if (document.getElementById('autoAdjustIter').checked) {
+                maxIter = Math.min(1024, Math.floor(256 + currentFrame * 2));
+                document.getElementById('maxIter').value = maxIter;
+                document.getElementById('iterValue').textContent = maxIter;
+            }
+            
+            currentFrame++;
+            zoomLevel = Math.pow(zoomSpeed, currentFrame);
+            
+            // Update UI
+            updateTimeline();
+            document.getElementById('zoomLevel').textContent = zoomLevel.toExponential(2) + 'x';
+            document.getElementById('currentFrame').textContent = currentFrame;
+            document.getElementById('centerCoords').textContent = 
+                `(${centerX.toFixed(6)}, ${centerY.toFixed(6)})`;
+            
+            // Generate next frame
+            generateFrame();
+            
+            // Continue animation
+            requestAnimationFrame(animationLoop);
+        }
+
+        async function generateFrame() {
+            showLoading(true);
+            
+            const scale = 3.5 / zoomLevel;
+            const xmin = centerX - scale/2;
+            const xmax = centerX + scale/2;
+            const ymin = centerY - scale/2;
+            const ymax = centerY + scale/2;
+            
+            try {
+                const response = await fetch('/api/mandelbrot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        width: width,
+                        height: height,
+                        max_iter: maxIter,
+                        xmin: xmin,
+                        xmax: xmax,
+                        ymin: ymin,
+                        ymax: ymax
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderFractal(data.data);
+                    document.getElementById('fractalDim').textContent = data.fractal_dimension.toFixed(4);
+                } else {
+                    console.error('Error:', data.error);
+                    updateStatus('Error!', 'idle');
+                    if (isPlaying) togglePlayPause();
+                }
+            } catch (error) {
+                console.error('Request failed:', error);
+                updateStatus('Error!', 'idle');
+                if (isPlaying) togglePlayPause();
+            }
+            
+            showLoading(false);
+        }
+
+        function renderFractal(data) {
+            const imageData = ctx.createImageData(width, height);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const value = data[y][x];
+                    const normalized = value / maxIter;
+                    
+                    // Beautiful gradient: cyan -> purple -> pink
+                    let r, g, b;
+                    if (normalized < 0.5) {
+                        const t = normalized * 2;
+                        r = Math.floor(0 + t * 123);
+                        g = Math.floor(212 - t * 168);
+                        b = Math.floor(255 - t * 64);
+                    } else {
+                        const t = (normalized - 0.5) * 2;
+                        r = Math.floor(123 + t * 132);
+                        g = Math.floor(44 - t * 44);
+                        b = Math.floor(191 - t * 81);
+                    }
+                    
+                    imageData.data[idx] = r;
+                    imageData.data[idx + 1] = g;
+                    imageData.data[idx + 2] = b;
+                    imageData.data[idx + 3] = 255;
+                }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function resetZoom() {
+            if (isPlaying) togglePlayPause();
+            currentFrame = 0;
+            zoomLevel = 1.0;
+            centerX = targetX;
+            centerY = targetY;
+            updateTimeline();
+            generateFrame();
+        }
+
+        function setTarget(x, y) {
+            targetX = x;
+            targetY = y;
+            document.getElementById('targetX').value = x;
+            document.getElementById('targetY').value = y;
+            updateStatus('Target updated!', 'active');
+            setTimeout(() => {
+                if (!isPlaying) updateStatus('Idle', 'idle');
+            }, 2000);
+        }
+
+        function setTargetFromCanvas() {
+            clickToSetTarget = true;
+            updateStatus('Click canvas to set target...', 'active');
+        }
+
+        function updateCustomTarget() {
+            targetX = parseFloat(document.getElementById('targetX').value);
+            targetY = parseFloat(document.getElementById('targetY').value);
+        }
+
+        function setQuality(w, h) {
+            width = w;
+            height = h;
+            canvas.width = w;
+            canvas.height = h;
+            
+            // Update active button
+            document.querySelectorAll('.quality-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            generateFrame();
+        }
+
+        function updateZoomSpeed(value) {
+            zoomSpeed = parseFloat(value);
+            document.getElementById('zoomSpeedValue').textContent = value + 'x';
+        }
+
+        function updateIter(value) {
+            maxIter = parseInt(value);
+            document.getElementById('iterValue').textContent = value;
+        }
+
+        function updateMaxFrames(value) {
+            maxFrames = parseInt(value);
+            document.getElementById('maxFramesValue').textContent = value === '0' ? '∞' : value;
+        }
+
+        function updateTimeline() {
+            if (maxFrames > 0) {
+                const progress = (currentFrame / maxFrames) * 100;
+                document.getElementById('timelineProgress').style.width = Math.min(progress, 100) + '%';
+            } else {
+                // For infinite, show something
+                const progress = Math.min(currentFrame / 100, 1) * 100;
+                document.getElementById('timelineProgress').style.width = progress + '%';
+            }
+        }
+
+        function updateStatus(text, state) {
+            document.getElementById('statusText').textContent = text;
+            const indicator = document.getElementById('statusIndicator');
+            indicator.className = 'status-indicator ' + state;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function generateSingleFrame() {
+            generateFrame();
+        }
+
+        function exportAnimation() {
+            const settings = {
+                centerX, centerY,
+                targetX, targetY,
+                zoomSpeed,
+                maxIter,
+                quality: { width, height },
+                currentFrame,
+                maxFrames,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fractal_settings_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

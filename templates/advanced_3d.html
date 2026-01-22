@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<!--
+    Advanced 3D Quantum Visualization System
+    Part of: Quantum Magnetic Field Calculator
+    
+    Copyright (c) 2026 Tony Ray Macier III
+    Licensed under the MIT License
+    
+    Author: Tony Ray Macier III
+    GitHub: @XxxGHOSTX
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced 3D Quantum Visualization - Complete System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* HUD Overlay */
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00d4ff;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .hud h2 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .equation {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: #a0a0a0;
+        }
+
+        .stat-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #7b2cbf;
+            width: 350px;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .control-panel h2 {
+            color: #7b2cbf;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .value-display {
+            display: inline-block;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .mode-btn {
+            padding: 12px;
+            background: rgba(123, 44, 191, 0.3);
+            border: 1px solid #7b2cbf;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .mode-btn:hover {
+            background: rgba(123, 44, 191, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #00d4ff, #7b2cbf);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Bottom Info Panel */
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #ff006e;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            gap: 30px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #a0a0a0;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #ff006e;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 212, 255, 0.3);
+            border-top: 4px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #00d4ff;
+            font-size: 1.2em;
+        }
+
+        /* Scrollbar styling */
+        .control-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .control-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb {
+            background: #7b2cbf;
+            border-radius: 10px;
+        }
+
+        .control-panel::-webkit-scrollbar-thumb:hover {
+            background: #00d4ff;
+        }
+
+        /* Toggle switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active .toggle-handle {
+            transform: translateX(26px);
+        }
+
+        .fps-counter {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            font-family: monospace;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <!-- FPS Counter -->
+    <div class="fps-counter" id="fpsCounter">FPS: 60</div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loadingSpinner">
+        <div class="spinner"></div>
+        <div class="loading-text">Initializing Quantum Simulation...</div>
+    </div>
+
+    <!-- HUD Overlay -->
+    <div class="hud">
+        <h2 id="hudTitle">🌌 Black Hole Thermodynamics</h2>
+        <div class="equation" id="primaryEquation">
+            T<sub>H</sub> = ℏc³/(8πk<sub>B</sub>GM)
+        </div>
+        <div id="hudStats">
+            <div class="stat-row">
+                <span class="stat-label">Schwarzschild Radius:</span>
+                <span class="stat-value" id="schwarzRadius">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Hawking Temperature:</span>
+                <span class="stat-value" id="hawkingTemp">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Entropy:</span>
+                <span class="stat-value" id="entropy">-</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Evaporation Time:</span>
+                <span class="stat-value" id="evapTime">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <h2>⚙️ Control Panel</h2>
+        
+        <div class="mode-buttons">
+            <button class="mode-btn active" onclick="setMode('blackhole')">🕳️ Black Hole</button>
+            <button class="mode-btn" onclick="setMode('fractal')">🌀 Fractal</button>
+            <button class="mode-btn" onclick="setMode('qec')">🔬 QEC</button>
+            <button class="mode-btn" onclick="setMode('bloch')">⚛️ Bloch Sphere</button>
+        </div>
+
+        <div id="blackhole-controls" class="control-section">
+            <div class="control-group">
+                <label>Black Hole Mass (M☉): <span class="value-display" id="massValue">10</span></label>
+                <input type="range" id="massSlider" min="1" max="100" value="10" step="1">
+            </div>
+            <div class="control-group">
+                <label>Spin Parameter (a/M): <span class="value-display" id="spinValue">0.5</span></label>
+                <input type="range" id="spinSlider" min="0" max="0.998" value="0.5" step="0.001">
+            </div>
+            <div class="control-group">
+                <label>Accretion Rate: <span class="value-display" id="accretionValue">0.5</span></label>
+                <input type="range" id="accretionSlider" min="0" max="1" value="0.5" step="0.01">
+            </div>
+            <div class="toggle-container">
+                <span>Hawking Radiation</span>
+                <div class="toggle active" id="radiationToggle" onclick="toggleRadiation()">
+                    <div class="toggle-handle"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="fractal-controls" class="control-section" style="display: none;">
+            <div class="control-group">
+                <label>Fractal Depth (D): <span class="value-display" id="depthValue">2.0</span></label>
+                <input type="range" id="depthSlider" min="1.5" max="3.0" value="2.0" step="0.01">
+            </div>
+            <div class="control-group">
+                <label>Coupling (λ): <span class="value-display" id="couplingValue">1.0</span></label>
+                <input type="range" id="couplingSlider" min="0.1" max="5.0" value="1.0" step="0.1">
+            </div>
+            <div class="control-group">
+                <label>Zoom Level: <span class="value-display" id="zoomValue">1.0</span></label>
+                <input type="range" id="zoomSlider" min="0.1" max="10" value="1.0" step="0.1">
+            </div>
+            <div class="control-group">
+                <label>Julia Seed (c): <span class="value-display" id="seedValue">-0.4+0.6i</span></label>
+                <input type="range" id="seedRealSlider" min="-1" max="1" value="-0.4" step="0.01">
+                <input type="range" id="seedImagSlider" min="-1" max="1" value="0.6" step="0.01">
+            </div>
+        </div>
+
+        <div id="qec-controls" class="control-section" style="display: none;">
+            <div class="control-group">
+                <label>Code Distance (d): <span class="value-display" id="codeDistValue">5</span></label>
+                <input type="range" id="codeDistSlider" min="3" max="15" value="5" step="2">
+            </div>
+            <div class="control-group">
+                <label>Error Probability (P): <span class="value-display" id="errorProbValue">0.001</span></label>
+                <input type="range" id="errorProbSlider" min="0.0001" max="0.01" value="0.001" step="0.0001">
+            </div>
+            <div class="control-group">
+                <label>Braiding Operations: <span class="value-display" id="braidingValue">10</span></label>
+                <input type="range" id="braidingSlider" min="1" max="50" value="10" step="1">
+            </div>
+        </div>
+
+        <div id="bloch-controls" class="control-section" style="display: none;">
+            <div class="control-group">
+                <label>Theta (θ): <span class="value-display" id="thetaValue">45°</span></label>
+                <input type="range" id="thetaSlider" min="0" max="180" value="45" step="1">
+            </div>
+            <div class="control-group">
+                <label>Phi (φ): <span class="value-display" id="phiValue">90°</span></label>
+                <input type="range" id="phiSlider" min="0" max="360" value="90" step="1">
+            </div>
+            <div class="control-group">
+                <label>Entanglement: <span class="value-display" id="entanglementValue">0.5</span></label>
+                <input type="range" id="entanglementSlider" min="0" max="1" value="0.5" step="0.01">
+            </div>
+        </div>
+
+        <button class="action-btn" onclick="exportData()">📊 Export Data</button>
+        <button class="action-btn" onclick="generatePublication()">📄 Generate Publication</button>
+        <button class="action-btn" onclick="resetSimulation()">🔄 Reset Simulation</button>
+    </div>
+
+    <!-- Bottom Info Panel -->
+    <div class="info-panel">
+        <div class="info-item">
+            <div class="info-label">Simulation Time</div>
+            <div class="info-value" id="simTime">0.00s</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Particles</div>
+            <div class="info-value" id="particleCount">0</div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Energy (J)</div>
+            <div class="info-value" id="energyValue">0</div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let scene, camera, renderer, controls;
+        let currentMode = 'blackhole';
+        let blackHoleObject, fractalMesh, qecLattice, blochSphere;
+        let animationId;
+        let simulationTime = 0;
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        // Physics constants
+        const CONSTANTS = {
+            G: 6.67430e-11,
+            c: 299792458,
+            hbar: 1.054571817e-34,
+            kB: 1.380649e-23,
+            solarMass: 1.989e30
+        };
+
+        // Initialize Three.js scene
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.0002);
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                10000
+            );
+            camera.position.set(0, 50, 100);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 500;
+            controls.minDistance = 10;
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0x00d4ff, 1, 1000);
+            pointLight.position.set(50, 50, 50);
+            scene.add(pointLight);
+            
+            // Star field background
+            createStarField();
+            
+            // Initial mode
+            createBlackHole();
+            
+            // Window resize handler
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation
+            animate();
+            
+            // Hide loading spinner
+            document.getElementById('loadingSpinner').classList.remove('active');
+        }
+
+        function createStarField() {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            
+            for (let i = 0; i < 10000; i++) {
+                const x = THREE.MathUtils.randFloatSpread(2000);
+                const y = THREE.MathUtils.randFloatSpread(2000);
+                const z = THREE.MathUtils.randFloatSpread(2000);
+                vertices.push(x, y, z);
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            
+            const material = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.7,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const stars = new THREE.Points(geometry, material);
+            scene.add(stars);
+        }
+
+        function createBlackHole() {
+            if (blackHoleObject) {
+                scene.remove(blackHoleObject);
+            }
+            
+            blackHoleObject = new THREE.Group();
+            
+            // Event horizon
+            const horizonGeometry = new THREE.SphereGeometry(10, 64, 64);
+            const horizonMaterial = new THREE.MeshPhongMaterial({
+                color: 0x000000,
+                emissive: 0x000000,
+                shininess: 100
+            });
+            const horizon = new THREE.Mesh(horizonGeometry, horizonMaterial);
+            blackHoleObject.add(horizon);
+            
+            // Accretion disk
+            const diskGeometry = new THREE.RingGeometry(15, 40, 64);
+            const diskMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    innerRadius: { value: 15 },
+                    outerRadius: { value: 40 }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    uniform float innerRadius;
+                    uniform float outerRadius;
+                    varying vec2 vUv;
+                    
+                    void main() {
+                        vec2 center = vec2(0.5, 0.5);
+                        float dist = distance(vUv, center) * 2.0;
+                        float angle = atan(vUv.y - 0.5, vUv.x - 0.5);
+                        
+                        // Temperature gradient (hotter near center)
+                        float temp = 1.0 - (dist - 0.3) / 0.7;
+                        
+                        // Rotation effect
+                        float rotation = angle + time * (1.0 / (dist + 0.1));
+                        float spiral = sin(rotation * 8.0 + dist * 10.0) * 0.5 + 0.5;
+                        
+                        // Color based on temperature
+                        vec3 coldColor = vec3(1.0, 0.0, 0.0); // Red
+                        vec3 hotColor = vec3(0.0, 0.8, 1.0); // Cyan
+                        vec3 color = mix(coldColor, hotColor, temp);
+                        
+                        float alpha = (spiral * 0.5 + 0.5) * temp;
+                        gl_FragColor = vec4(color, alpha);
+                    }
+                `,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            const disk = new THREE.Mesh(diskGeometry, diskMaterial);
+            disk.rotation.x = Math.PI / 2;
+            blackHoleObject.add(disk);
+            
+            // Photon sphere (visualization only)
+            const photonGeometry = new THREE.SphereGeometry(15, 32, 32);
+            const photonMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.1,
+                wireframe: true
+            });
+            const photonSphere = new THREE.Mesh(photonGeometry, photonMaterial);
+            blackHoleObject.add(photonSphere);
+            
+            // Hawking radiation particles
+            createHawkingRadiation(blackHoleObject);
+            
+            scene.add(blackHoleObject);
+            updateBlackHolePhysics();
+        }
+
+        function createHawkingRadiation(parent) {
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const velocities = [];
+            
+            for (let i = 0; i < particleCount; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI;
+                const radius = 12 + Math.random() * 3;
+                
+                positions.push(
+                    radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.sin(phi) * Math.sin(theta),
+                    radius * Math.cos(phi)
+                );
+                
+                velocities.push(
+                    Math.random() * 0.2 - 0.1,
+                    Math.random() * 0.2 - 0.1,
+                    Math.random() * 0.2 - 0.1
+                );
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
+            
+            const material = new THREE.PointsMaterial({
+                color: 0x00d4ff,
+                size: 0.3,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geometry, material);
+            particles.name = 'hawkingRadiation';
+            parent.add(particles);
+        }
+
+        function createFractal() {
+            if (fractalMesh) {
+                scene.remove(fractalMesh);
+            }
+            
+            const geometry = new THREE.PlaneGeometry(100, 100, 256, 256);
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 },
+                    depth: { value: 2.0 },
+                    coupling: { value: 1.0 },
+                    zoom: { value: 1.0 },
+                    seedReal: { value: -0.4 },
+                    seedImag: { value: 0.6 }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    uniform float time;
+                    uniform float depth;
+                    
+                    float mandelbrot(vec2 c) {
+                        vec2 z = vec2(0.0);
+                        float iterations = 0.0;
+                        
+                        for (int i = 0; i < 128; i++) {
+                            if (dot(z, z) > 4.0) break;
+                            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+                            iterations += 1.0;
+                        }
+                        
+                        return iterations / 128.0;
+                    }
+                    
+                    void main() {
+                        vUv = uv;
+                        vPosition = position;
+                        
+                        vec2 c = (uv - 0.5) * 4.0;
+                        float m = mandelbrot(c);
+                        
+                        vec3 displaced = position;
+                        displaced.z += m * 10.0 * depth;
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    uniform float coupling;
+                    uniform float seedReal;
+                    uniform float seedImag;
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    
+                    float julia(vec2 z, vec2 c) {
+                        float iterations = 0.0;
+                        
+                        for (int i = 0; i < 128; i++) {
+                            if (dot(z, z) > 4.0) break;
+                            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+                            iterations += 1.0;
+                        }
+                        
+                        return iterations / 128.0;
+                    }
+                    
+                    void main() {
+                        vec2 z = (vUv - 0.5) * 4.0;
+                        vec2 c = vec2(seedReal, seedImag);
+                        float j = julia(z, c);
+                        
+                        // Color mapping
+                        vec3 color1 = vec3(0.0, 0.8, 1.0); // Cyan
+                        vec3 color2 = vec3(0.48, 0.17, 0.75); // Purple
+                        vec3 color3 = vec3(1.0, 0.0, 0.43); // Pink
+                        
+                        vec3 color;
+                        if (j < 0.5) {
+                            color = mix(color1, color2, j * 2.0);
+                        } else {
+                            color = mix(color2, color3, (j - 0.5) * 2.0);
+                        }
+                        
+                        float alpha = j * coupling;
+                        gl_FragColor = vec4(color, alpha);
+                    }
+                `,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            
+            fractalMesh = new THREE.Mesh(geometry, material);
+            scene.add(fractalMesh);
+        }
+
+        function createQECLattice() {
+            if (qecLattice) {
+                scene.remove(qecLattice);
+            }
+            
+            qecLattice = new THREE.Group();
+            const distance = parseInt(document.getElementById('codeDistSlider').value);
+            const spacing = 10;
+            
+            // Create surface code lattice
+            for (let x = 0; x < distance; x++) {
+                for (let y = 0; y < distance; y++) {
+                    // Data qubits
+                    const dataGeometry = new THREE.SphereGeometry(1, 16, 16);
+                    const dataMaterial = new THREE.MeshPhongMaterial({
+                        color: 0x00d4ff,
+                        emissive: 0x0066ff,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const dataQubit = new THREE.Mesh(dataGeometry, dataMaterial);
+                    dataQubit.position.set(x * spacing, y * spacing, 0);
+                    qecLattice.add(dataQubit);
+                    
+                    // Stabilizer qubits
+                    if (x < distance - 1 && y < distance - 1) {
+                        const stabGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+                        const stabMaterial = new THREE.MeshPhongMaterial({
+                            color: 0x7b2cbf,
+                            emissive: 0x4a1a6f,
+                            transparent: true,
+                            opacity: 0.6
+                        });
+                        const stabQubit = new THREE.Mesh(stabGeometry, stabMaterial);
+                        stabQubit.position.set(
+                            x * spacing + spacing / 2,
+                            y * spacing + spacing / 2,
+                            0
+                        );
+                        qecLattice.add(stabQubit);
+                    }
+                }
+            }
+            
+            // Add connections
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x00d4ff,
+                opacity: 0.3,
+                transparent: true
+            });
+            
+            for (let x = 0; x < distance; x++) {
+                for (let y = 0; y < distance - 1; y++) {
+                    const geometry = new THREE.BufferGeometry();
+                    const vertices = new Float32Array([
+                        x * spacing, y * spacing, 0,
+                        x * spacing, (y + 1) * spacing, 0
+                    ]);
+                    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                    const line = new THREE.Line(geometry, lineMaterial);
+                    qecLattice.add(line);
+                }
+            }
+            
+            for (let x = 0; x < distance - 1; x++) {
+                for (let y = 0; y < distance; y++) {
+                    const geometry = new THREE.BufferGeometry();
+                    const vertices = new Float32Array([
+                        x * spacing, y * spacing, 0,
+                        (x + 1) * spacing, y * spacing, 0
+                    ]);
+                    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                    const line = new THREE.Line(geometry, lineMaterial);
+                    qecLattice.add(line);
+                }
+            }
+            
+            // Center the lattice
+            qecLattice.position.set(-distance * spacing / 2, -distance * spacing / 2, 0);
+            scene.add(qecLattice);
+        }
+
+        function createBlochSphere() {
+            if (blochSphere) {
+                scene.remove(blochSphere);
+            }
+            
+            blochSphere = new THREE.Group();
+            
+            // Sphere wireframe
+            const sphereGeometry = new THREE.SphereGeometry(30, 32, 32);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                transparent: true,
+                opacity: 0.1,
+                wireframe: true
+            });
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            blochSphere.add(sphere);
+            
+            // Axes
+            const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+            
+            // X axis (red)
+            const xGeometry = new THREE.BufferGeometry();
+            xGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+                -40, 0, 0, 40, 0, 0
+            ]), 3));
+            const xAxis = new THREE.Line(xGeometry, new THREE.LineBasicMaterial({ color: 0xff0000 }));
+            blochSphere.add(xAxis);
+            
+            // Y axis (green)
+            const yGeometry = new THREE.BufferGeometry();
+            yGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+                0, -40, 0, 0, 40, 0
+            ]), 3));
+            const yAxis = new THREE.Line(yGeometry, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+            blochSphere.add(yAxis);
+            
+            // Z axis (blue)
+            const zGeometry = new THREE.BufferGeometry();
+            zGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+                0, 0, -40, 0, 0, 40
+            ]), 3));
+            const zAxis = new THREE.Line(zGeometry, new THREE.LineBasicMaterial({ color: 0x0000ff }));
+            blochSphere.add(zAxis);
+            
+            // State vector
+            const vectorGeometry = new THREE.ConeGeometry(2, 5, 16);
+            const vectorMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00d4ff,
+                emissive: 0x0066ff
+            });
+            const vector = new THREE.Mesh(vectorGeometry, vectorMaterial);
+            vector.name = 'stateVector';
+            blochSphere.add(vector);
+            
+            // Update initial position
+            updateBlochVector();
+            
+            scene.add(blochSphere);
+        }
+
+        function updateBlochVector() {
+            if (!blochSphere) return;
+            
+            const theta = parseFloat(document.getElementById('thetaSlider').value) * Math.PI / 180;
+            const phi = parseFloat(document.getElementById('phiSlider').value) * Math.PI / 180;
+            
+            const vector = blochSphere.getObjectByName('stateVector');
+            if (vector) {
+                const x = 30 * Math.sin(theta) * Math.cos(phi);
+                const y = 30 * Math.sin(theta) * Math.sin(phi);
+                const z = 30 * Math.cos(theta);
+                
+                vector.position.set(x, y, z);
+                vector.lookAt(0, 0, 0);
+                vector.rotateX(Math.PI / 2);
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Hide all control sections
+            document.querySelectorAll('.control-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show relevant controls
+            document.getElementById(mode + '-controls').style.display = 'block';
+            
+            // Clear scene of mode-specific objects
+            if (blackHoleObject) scene.remove(blackHoleObject);
+            if (fractalMesh) scene.remove(fractalMesh);
+            if (qecLattice) scene.remove(qecLattice);
+            if (blochSphere) scene.remove(blochSphere);
+            
+            // Create new visualization
+            switch(mode) {
+                case 'blackhole':
+                    createBlackHole();
+                    document.getElementById('hudTitle').textContent = '🌌 Black Hole Thermodynamics';
+                    document.getElementById('primaryEquation').innerHTML = 'T<sub>H</sub> = ℏc³/(8πk<sub>B</sub>GM)';
+                    break;
+                case 'fractal':
+                    createFractal();
+                    document.getElementById('hudTitle').textContent = '🌀 Fractal Spacetime';
+                    document.getElementById('primaryEquation').innerHTML = 'z<sub>n+1</sub> = z<sub>n</sub>² + c';
+                    break;
+                case 'qec':
+                    createQECLattice();
+                    document.getElementById('hudTitle').textContent = '🔬 Quantum Error Correction';
+                    document.getElementById('primaryEquation').innerHTML = 'p<sub>L</sub> ≈ (p/p<sub>th</sub>)<sup>(d+1)/2</sup>';
+                    break;
+                case 'bloch':
+                    createBlochSphere();
+                    document.getElementById('hudTitle').textContent = '⚛️ Bloch Sphere';
+                    document.getElementById('primaryEquation').innerHTML = '|ψ⟩ = cos(θ/2)|0⟩ + e<sup>iφ</sup>sin(θ/2)|1⟩';
+                    break;
+            }
+        }
+
+        function updateBlackHolePhysics() {
+            const mass = parseFloat(document.getElementById('massSlider').value) * CONSTANTS.solarMass;
+            const spin = parseFloat(document.getElementById('spinSlider').value);
+            
+            // Schwarzschild radius
+            const rs = 2 * CONSTANTS.G * mass / (CONSTANTS.c * CONSTANTS.c);
+            
+            // Hawking temperature
+            const temp = CONSTANTS.hbar * CONSTANTS.c * CONSTANTS.c * CONSTANTS.c / 
+                         (8 * Math.PI * CONSTANTS.kB * CONSTANTS.G * mass);
+            
+            // Entropy
+            const area = 4 * Math.PI * rs * rs;
+            const lPlanck = Math.sqrt(CONSTANTS.hbar * CONSTANTS.G / (CONSTANTS.c * CONSTANTS.c * CONSTANTS.c));
+            const entropy = CONSTANTS.kB * area / (4 * lPlanck * lPlanck);
+            
+            // Evaporation time
+            const evapTime = 5120 * Math.PI * CONSTANTS.G * CONSTANTS.G * mass * mass * mass / 
+                            (CONSTANTS.hbar * CONSTANTS.c * CONSTANTS.c * CONSTANTS.c * CONSTANTS.c);
+            
+            // Update HUD
+            document.getElementById('schwarzRadius').textContent = (rs / 1000).toExponential(2) + ' km';
+            document.getElementById('hawkingTemp').textContent = temp.toExponential(2) + ' K';
+            document.getElementById('entropy').textContent = entropy.toExponential(2) + ' J/K';
+            document.getElementById('evapTime').textContent = (evapTime / (365.25 * 24 * 3600)).toExponential(2) + ' yrs';
+            
+            // Update visualization scale
+            if (blackHoleObject) {
+                const scale = Math.log10(mass / CONSTANTS.solarMass) / 2 + 1;
+                blackHoleObject.scale.set(scale, scale, scale);
+            }
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            const currentTime = performance.now();
+            simulationTime += (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
+            // Update FPS
+            frameCount++;
+            if (frameCount % 60 === 0) {
+                const fps = Math.round(1000 / (currentTime - lastTime));
+                document.getElementById('fpsCounter').textContent = 'FPS: ' + fps;
+            }
+            
+            // Update based on current mode
+            if (currentMode === 'blackhole' && blackHoleObject) {
+                blackHoleObject.rotation.y += 0.005;
+                
+                // Animate accretion disk
+                const disk = blackHoleObject.children.find(child => 
+                    child.material && child.material.uniforms && child.material.uniforms.time
+                );
+                if (disk) {
+                    disk.material.uniforms.time.value = simulationTime;
+                }
+                
+                // Animate Hawking radiation
+                const radiation = blackHoleObject.getObjectByName('hawkingRadiation');
+                if (radiation) {
+                    const positions = radiation.geometry.attributes.position.array;
+                    const velocities = radiation.geometry.attributes.velocity.array;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        positions[i] += velocities[i];
+                        positions[i + 1] += velocities[i + 1];
+                        positions[i + 2] += velocities[i + 2];
+                        
+                        // Reset if too far
+                        const dist = Math.sqrt(
+                            positions[i] * positions[i] +
+                            positions[i + 1] * positions[i + 1] +
+                            positions[i + 2] * positions[i + 2]
+                        );
+                        
+                        if (dist > 50) {
+                            const theta = Math.random() * Math.PI * 2;
+                            const phi = Math.random() * Math.PI;
+                            const radius = 12 + Math.random() * 3;
+                            
+                            positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                            positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                            positions[i + 2] = radius * Math.cos(phi);
+                        }
+                    }
+                    
+                    radiation.geometry.attributes.position.needsUpdate = true;
+                }
+            }
+            
+            if (currentMode === 'fractal' && fractalMesh) {
+                fractalMesh.material.uniforms.time.value = simulationTime;
+                fractalMesh.rotation.z += 0.001;
+            }
+            
+            if (currentMode === 'qec' && qecLattice) {
+                qecLattice.rotation.y += 0.005;
+            }
+            
+            if (currentMode === 'bloch' && blochSphere) {
+                blochSphere.rotation.y += 0.01;
+            }
+            
+            // Update info panel
+            document.getElementById('simTime').textContent = simulationTime.toFixed(2) + 's';
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Control handlers
+        document.getElementById('massSlider').addEventListener('input', function(e) {
+            document.getElementById('massValue').textContent = e.target.value;
+            if (currentMode === 'blackhole') updateBlackHolePhysics();
+        });
+
+        document.getElementById('spinSlider').addEventListener('input', function(e) {
+            document.getElementById('spinValue').textContent = e.target.value;
+            if (currentMode === 'blackhole') updateBlackHolePhysics();
+        });
+
+        document.getElementById('accretionSlider').addEventListener('input', function(e) {
+            document.getElementById('accretionValue').textContent = e.target.value;
+        });
+
+        document.getElementById('depthSlider').addEventListener('input', function(e) {
+            document.getElementById('depthValue').textContent = e.target.value;
+            if (fractalMesh) {
+                fractalMesh.material.uniforms.depth.value = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('couplingSlider').addEventListener('input', function(e) {
+            document.getElementById('couplingValue').textContent = e.target.value;
+            if (fractalMesh) {
+                fractalMesh.material.uniforms.coupling.value = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('zoomSlider').addEventListener('input', function(e) {
+            document.getElementById('zoomValue').textContent = e.target.value;
+            if (fractalMesh) {
+                fractalMesh.material.uniforms.zoom.value = parseFloat(e.target.value);
+            }
+        });
+
+        document.getElementById('seedRealSlider').addEventListener('input', function(e) {
+            const real = parseFloat(e.target.value);
+            const imag = parseFloat(document.getElementById('seedImagSlider').value);
+            document.getElementById('seedValue').textContent = real.toFixed(2) + (imag >= 0 ? '+' : '') + imag.toFixed(2) + 'i';
+            if (fractalMesh) {
+                fractalMesh.material.uniforms.seedReal.value = real;
+            }
+        });
+
+        document.getElementById('seedImagSlider').addEventListener('input', function(e) {
+            const real = parseFloat(document.getElementById('seedRealSlider').value);
+            const imag = parseFloat(e.target.value);
+            document.getElementById('seedValue').textContent = real.toFixed(2) + (imag >= 0 ? '+' : '') + imag.toFixed(2) + 'i';
+            if (fractalMesh) {
+                fractalMesh.material.uniforms.seedImag.value = imag;
+            }
+        });
+
+        document.getElementById('codeDistSlider').addEventListener('input', function(e) {
+            document.getElementById('codeDistValue').textContent = e.target.value;
+            if (currentMode === 'qec') createQECLattice();
+        });
+
+        document.getElementById('errorProbSlider').addEventListener('input', function(e) {
+            document.getElementById('errorProbValue').textContent = parseFloat(e.target.value).toFixed(4);
+        });
+
+        document.getElementById('braidingSlider').addEventListener('input', function(e) {
+            document.getElementById('braidingValue').textContent = e.target.value;
+        });
+
+        document.getElementById('thetaSlider').addEventListener('input', function(e) {
+            document.getElementById('thetaValue').textContent = e.target.value + '°';
+            if (currentMode === 'bloch') updateBlochVector();
+        });
+
+        document.getElementById('phiSlider').addEventListener('input', function(e) {
+            document.getElementById('phiValue').textContent = e.target.value + '°';
+            if (currentMode === 'bloch') updateBlochVector();
+        });
+
+        document.getElementById('entanglementSlider').addEventListener('input', function(e) {
+            document.getElementById('entanglementValue').textContent = e.target.value;
+        });
+
+        function toggleRadiation() {
+            const toggle = document.getElementById('radiationToggle');
+            toggle.classList.toggle('active');
+            
+            if (blackHoleObject) {
+                const radiation = blackHoleObject.getObjectByName('hawkingRadiation');
+                if (radiation) {
+                    radiation.visible = toggle.classList.contains('active');
+                }
+            }
+        }
+
+        function exportData() {
+            const data = {
+                mode: currentMode,
+                simulationTime: simulationTime,
+                timestamp: new Date().toISOString(),
+                parameters: {}
+            };
+            
+            if (currentMode === 'blackhole') {
+                data.parameters = {
+                    mass: document.getElementById('massValue').textContent,
+                    spin: document.getElementById('spinValue').textContent,
+                    accretion: document.getElementById('accretionValue').textContent,
+                    schwarzRadius: document.getElementById('schwarzRadius').textContent,
+                    hawkingTemp: document.getElementById('hawkingTemp').textContent,
+                    entropy: document.getElementById('entropy').textContent,
+                    evapTime: document.getElementById('evapTime').textContent
+                };
+            }
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'quantum_simulation_' + Date.now() + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generatePublication() {
+            let publication = `# Quantum Simulation Results\n\n`;
+            publication += `**Generated:** ${new Date().toLocaleString()}\n\n`;
+            publication += `## Simulation Parameters\n\n`;
+            publication += `- **Mode:** ${currentMode}\n`;
+            publication += `- **Simulation Time:** ${simulationTime.toFixed(2)}s\n\n`;
+            
+            if (currentMode === 'blackhole') {
+                publication += `## Black Hole Thermodynamics\n\n`;
+                publication += `### Equations\n\n`;
+                publication += `Hawking Temperature:\n`;
+                publication += `$$T_H = \\frac{\\hbar c^3}{8\\pi k_B G M}$$\n\n`;
+                publication += `Bekenstein-Hawking Entropy:\n`;
+                publication += `$$S_{BH} = \\frac{k_B A}{4 \\ell_P^2}$$\n\n`;
+                publication += `### Results\n\n`;
+                publication += `- Mass: ${document.getElementById('massValue').textContent} M☉\n`;
+                publication += `- Schwarzschild Radius: ${document.getElementById('schwarzRadius').textContent}\n`;
+                publication += `- Hawking Temperature: ${document.getElementById('hawkingTemp').textContent}\n`;
+                publication += `- Entropy: ${document.getElementById('entropy').textContent}\n`;
+                publication += `- Evaporation Time: ${document.getElementById('evapTime').textContent}\n\n`;
+            }
+            
+            publication += `## Conclusion\n\n`;
+            publication += `This simulation demonstrates the quantum properties of ${currentMode} systems.\n`;
+            
+            const blob = new Blob([publication], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'quantum_publication_' + Date.now() + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetSimulation() {
+            simulationTime = 0;
+            frameCount = 0;
+            
+            // Reset all sliders to default values
+            document.getElementById('massSlider').value = 10;
+            document.getElementById('massValue').textContent = '10';
+            document.getElementById('spinSlider').value = 0.5;
+            document.getElementById('spinValue').textContent = '0.5';
+            document.getElementById('accretionSlider').value = 0.5;
+            document.getElementById('accretionValue').textContent = '0.5';
+            
+            // Recreate current visualization
+            setMode(currentMode);
+        }
+
+        // Initialize when DOM is loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loadingSpinner').classList.add('active');
+            setTimeout(initThreeJS, 500);
+        });
+    </script>
+</body>
+</html>

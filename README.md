@@ -1,39 +1,83 @@
-# x_point
+# Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
 
-This Python code calculates the x-coordinate of the x-point in a magnetic field using quantum qubits.
+**Copyright © 2026 Tony Ray Macier III** | Licensed under MIT License
 
-## Requirements
+A comprehensive quantum physics visualization and calculation system integrating magnetic field analysis, fractal geometry, and advanced quantum mechanics.
 
-* Python 3
-* NumPy
-* Math
-* Pandas
-* Matplotlib
+---
 
-## Usage
+## 📜 Copyright and License
 
-To run the code, save it as a Python file and then run it from the command line. For example, if you saved the code as `x_point.py`, you could run it by typing the following command into the command line:
+**Author**: Tony Ray Macier III  
+**GitHub**: [@XxxGHOSTX](https://github.com/XxxGHOSTX)  
+**License**: MIT License - see [LICENSE](LICENSE) file  
+**Credits**: See [CREDITS.md](CREDITS.md) for detailed attribution
 
+**© 2026 Tony Ray Macier III. All rights reserved.**
 
-python x_point.py
+---
 
+## 🚀 Quick Start
 
-This will run the code and print the results.
+```bash
+git clone https://github.com/XxxGHOSTX/quantum.calc.magneticfield.git
+cd quantum.calc.magneticfield
+conda env create -f environment.yml
+conda activate quantum_calc
+python web_app.py
+```
 
-## Data
+**Access**:
+- 2D Interface with Infinite Zoom: http://localhost:5000
+- 3D Visualization: http://localhost:5000/3d
 
-The code requires a CSV file with the following columns:
+---
 
-* By: The By component of the magnetic field.
-* Bz: The Bz component of the magnetic field.
-* theta: The angle between the By and Bz components of the magnetic field.
+## 🌟 Key Features
 
-The CSV file must be named `solar_corona_magnetic_field.csv` and it must be in the same directory as the Python file.
+### Infinite Zoom System (NEW!)
+- ▶️ Play/pause automated zooming
+- 📊 Timeline progress bar
+- 🎯 Preset & custom target selection
+- ⚙️ Variable zoom speeds (1.01x - 1.20x)
+- 🎨 Quality presets (140p - 720p)
+- 💾 Export settings to JSON
 
-## Output
+### 3D Visualizations
+- 🕳️ Black holes with Hawking radiation
+- 🌀 Fractal spacetime landscapes
+- 🔬 Quantum error correction lattices
+- ⚛️ Interactive Bloch spheres
 
-The code will print the x-coordinate of the x-point for each data point in the CSV file.
+### Physics & Math
+- 23+ advanced quantum equations
+- Magnetic field x-point calculations
+- Black hole thermodynamics
+- Quantum sensing framework
+- Real-time calculations
 
-## Author
+---
 
-This code was created by LT.III
+## 📖 Citation
+
+```bibtex
+@software{macier2026quantum,
+  author = {Macier III, Tony Ray},
+  title = {Quantum Magnetic Field Calculator},
+  year = {2026},
+  url = {https://github.com/XxxGHOSTX/quantum.calc.magneticfield}
+}
+```
+
+---
+
+## 📄 Documentation
+
+- [LICENSE](LICENSE) - MIT License terms
+- [CREDITS.md](CREDITS.md) - Detailed credits
+- [PUBLICATION_DOCUMENTATION.md](PUBLICATION_DOCUMENTATION.md) - Academic theory
+- [COMPLETE_SYSTEM_GUIDE.md](COMPLETE_SYSTEM_GUIDE.md) - Full guide
+
+---
+
+**Tony Ray Macier III** | MIT License | Attribution Required
