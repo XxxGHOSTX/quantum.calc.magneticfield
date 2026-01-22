@@ -1,6 +1,13 @@
 """
 Interactive Web Application for Mandelbrot Fractal and Magnetic Field Visualization
 Integrates quantum mechanics, fractal geometry, and magnetic field calculations
+
+Copyright (c) 2026 Tony Ray Macier III
+Licensed under the MIT License - see LICENSE file for details
+
+Author: Tony Ray Macier III
+GitHub: @XxxGHOSTX
+Project: Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
 """
 
 from flask import Flask, render_template, jsonify, request, redirect

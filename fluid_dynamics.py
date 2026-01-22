@@ -3,6 +3,17 @@ Generalized Motion and Fluid Dynamics Integration
 Combines electromagnetic forces, fluid dynamics, and quantum effects
 """
 
+"""
+Fluid Dynamics - Generalized Motion Equations
+
+Copyright (c) 2026 Tony Ray Macier III
+Licensed under the MIT License - see LICENSE file for details
+
+Author: Tony Ray Macier III
+GitHub: @XxxGHOSTX
+Project: Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint

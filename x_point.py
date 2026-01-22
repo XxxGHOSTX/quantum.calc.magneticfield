@@ -1,3 +1,14 @@
+"""
+X-Point Magnetic Field Calculator for Solar Corona Analysis
+
+Copyright (c) 2026 Tony Ray Macier III
+Licensed under the MIT License - see LICENSE file for details
+
+Author: Tony Ray Macier III
+GitHub: @XxxGHOSTX
+Project: Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
+"""
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

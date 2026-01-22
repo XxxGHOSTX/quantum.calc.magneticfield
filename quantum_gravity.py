@@ -1,6 +1,13 @@
 """
 Quantum Gravity Equation Framework
 Implementing comprehensive quantum gravity with Mandelbrot fractal integration
+
+Copyright (c) 2026 Tony Ray Macier III
+Licensed under the MIT License - see LICENSE file for details
+
+Author: Tony Ray Macier III
+GitHub: @XxxGHOSTX
+Project: Quantum Magnetic Field Calculator with Mandelbrot Fractal Analysis
 """
 
 import numpy as np
