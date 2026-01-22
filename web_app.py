@@ -3,19 +3,29 @@ Interactive Web Application for Mandelbrot Fractal and Magnetic Field Visualizat
 Integrates quantum mechanics, fractal geometry, and magnetic field calculations
 """
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 import numpy as np
 import json
 from mandelbrot_fractal import MandelbrotSet, integrate_mandelbrot_xpoint
 from x_point import x_point
+from advanced_quantum_equations import (
+    BlackHoleThermodynamics, QuantumErrorCorrection, 
+    QuantumSensingFramework, MultiverseQuantumCoupling
+)
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    """Main page route"""
+    """Main page route - 2D visualization"""
     return render_template('index.html')
+
+
+@app.route('/3d')
+def advanced_3d():
+    """Advanced 3D visualization with Three.js"""
+    return render_template('advanced_3d.html')
 
 
 @app.route('/api/mandelbrot', methods=['POST'])
@@ -181,7 +191,9 @@ if __name__ == '__main__':
     print("=" * 60)
     print("Starting Quantum Magnetic Field Fractal Web Application")
     print("=" * 60)
-    print("\nNavigate to: http://127.0.0.1:5000")
+    print("\nAvailable Routes:")
+    print("  - 2D Visualization: http://127.0.0.1:5000")
+    print("  - 3D Advanced View: http://127.0.0.1:5000/3d")
     print("\nPress Ctrl+C to stop the server")
     print("=" * 60)
     app.run(debug=True, host='0.0.0.0', port=5000)
