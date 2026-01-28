@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include requirements.txt
+include environment.yml
+include CREDITS.md
+include *.csv
+recursive-include templates *.html
+recursive-include templates *.css
+recursive-include templates *.js
