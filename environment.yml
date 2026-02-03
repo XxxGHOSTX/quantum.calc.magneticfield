@@ -9,6 +9,8 @@ dependencies:
   - matplotlib
   - pytest
   - flake8
+  - flask
+  - colorama
   - pip
   - pip:
     - pytest-cov
