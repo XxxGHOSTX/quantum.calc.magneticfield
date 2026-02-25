@@ -51,7 +51,8 @@ class SpinLattice:
             raise ValueError("field must match spin dimensionality")
         self.field = field_arr
 
-        # Uniaxial anisotropy axis (defaults to last component)
+        # Uniaxial anisotropy axis (defaults to last component). We treat
+        # anisotropy as an easy-axis term with positive magnitude.
         if anisotropy_axis is None:
             axis = np.zeros(self.spin_components)
             axis[-1] = 1.0
@@ -62,7 +63,7 @@ class SpinLattice:
         # Normalize axis for stable energy evaluation
         norm = np.linalg.norm(axis)
         self.anisotropy_axis = axis / norm if norm != 0 else axis
-        self.anisotropy = float(anisotropy)
+        self.anisotropy = abs(float(anisotropy))
 
         self.spins = self._initialize_spins()
 
@@ -112,7 +113,7 @@ class SpinLattice:
         if self.anisotropy != 0.0:
             projection = self._dot(self.spins, self.anisotropy_axis)
             # Easy-axis convention: positive anisotropy favors alignment with axis
-            anisotropy_term = -abs(self.anisotropy) * np.sum(projection ** 2)
+            anisotropy_term = -self.anisotropy * np.sum(projection ** 2)
         else:
             anisotropy_term = 0.0
 
@@ -131,12 +132,14 @@ class SpinLattice:
             neighbor_energy += self._dot(s, self.spins[tuple(plus)])
             neighbor_energy += self._dot(s, self.spins[tuple(minus)])
 
-        exchange = -0.5 * self.J * neighbor_energy  # each bond counted twice
+        # Local view touches each bond from both endpoints; half-count to match
+        # the once-per-bond convention used in total_energy().
+        exchange = -0.5 * self.J * neighbor_energy
         field = -self._dot(s, self.field)
         anis = 0.0
         if self.anisotropy != 0.0:
             proj = self._dot(s, self.anisotropy_axis)
-            anis = -abs(self.anisotropy) * (proj ** 2)
+            anis = -self.anisotropy * (proj ** 2)
 
         return float(exchange + field + anis)
 
