@@ -18,7 +18,7 @@ from advanced_quantum_equations import (
 
 HOST = os.getenv("QUANTUM_WEB_HOST", "127.0.0.1").strip() or "127.0.0.1"
 PORT = int(os.getenv("QUANTUM_WEB_PORT", "5000"))
-_ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"}
+_ALLOWED_HOSTS = {"127.0.0.1", "localhost", "::1", f"127.0.0.1:{PORT}", f"localhost:{PORT}", f"[::1]:{PORT}"}
 _ALLOWED_ORIGINS = {f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}", f"http://[::1]:{PORT}"}
 
 app = Flask(__name__)
@@ -28,9 +28,6 @@ app.config["MAX_CONTENT_LENGTH"] = 256 * 1024
 @app.before_request
 def restrict_api_to_local_clients():
     """Keep calculator APIs local even when an accidental non-local bind is configured."""
-    if not request.path.startswith("/api/"):
-        return None
-
     try:
         if not ipaddress.ip_address(request.remote_addr or "").is_loopback:
             return jsonify({"success": False, "error": "API access is restricted to local clients."}), 403
